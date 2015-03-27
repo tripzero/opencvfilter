@@ -113,12 +113,12 @@ class OpenCVPassthrough(OpenCVBaseFilter):
 	_srctemplate = Gst.PadTemplate.new('src',
 		Gst.PadDirection.SRC,
 		Gst.PadPresence.ALWAYS,
-		Gst.Caps.from_string("video/x-raw,format=RGBx"))
+		Gst.Caps.from_string("video/x-raw,format=I420"))
 
 	_sinktemplate = Gst.PadTemplate.new('sink',
 		Gst.PadDirection.SINK,
 		Gst.PadPresence.ALWAYS,
-		Gst.Caps.from_string("video/x-raw,format=RGBx"))
+		Gst.Caps.from_string("video/x-raw,format=I420"))
 
 	__gsttemplates__ = (_srctemplate, _sinktemplate)
 
@@ -132,7 +132,7 @@ class OpenCVPassthrough(OpenCVBaseFilter):
 	def do_transform_frame_ip(self, inframe):
 		imgBuf = inframe.buffer.extract_dup(0, inframe.buffer.get_size())
 		#self.executor.submit(img_of_frame_i420, inframe).add_done_callback(self.checkResult)
-		self.callback(img_of_frame(inframe))
+		self.callback(img_of_frame_i420(inframe))
 		return Gst.FlowReturn.OK
 
 	def do_set_info(self, incaps, in_info, outcaps, out_info):
