@@ -10,10 +10,6 @@ from gi.repository import GObject, GstVideo, Gst
 
 import gst_hacks as hacks
 
-GObject.threads_init()
-Gst.init()
-
-
 def img_of_frame(frame):
 	data = hacks.get_array_video_frame_data_plane(frame.data[0], frame.info.size)
 	width = frame.info.width
@@ -40,7 +36,7 @@ def get_rect_i420(img, x, y, width, height):
 	imgHeight, imgWidth = img.shape
 	imgHeight = imgHeight / 1.25
 
-	print "height: ", imgHeight
+	print("height: ", imgHeight)
 
 	y = np.array(img[:imgHeight, :imgWidth], np.uint8, copy=False)
 
@@ -48,8 +44,8 @@ def get_rect_i420(img, x, y, width, height):
 	#u = np.array(, np.uint8, copy=False)
 	#v = np.array(img[imgHeight/2:imgHeight/2, imgWidth/2:imgWidth/2], np.uint8, copy=False)
 
-	print y
-	print img[imgHeight:imgHeight + imgHeight/4]
+	print (y)
+	print (img[imgHeight:imgHeight + imgHeight/4])
 	#print u
 	#print v
 
