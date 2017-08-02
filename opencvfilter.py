@@ -6,7 +6,12 @@ import datetime
 import sys
 import concurrent.futures
 
-from gi.repository import GObject, GstVideo, Gst
+import gi
+gi.require_version('Gst', '1.0')
+gi.require_version('GstVideo', '1.0')
+gi.require_version('GstBase', '1.0')
+
+from gi.repository import GObject, GstVideo, Gst, GstBase
 
 import gst_hacks as hacks
 
@@ -49,7 +54,7 @@ def get_rect_i420(img, x, y, width, height):
 	#print u
 	#print v
 
-class OpenCVBaseFilter(GstVideo.VideoFilter):
+class OpenCVBaseFilter(GstBase.BaseTransform):
 	""" A basic, buffer forwarding Gstreamer element """
 
 	#here we register our plugin details
@@ -109,7 +114,7 @@ class OpenCVPassthrough(OpenCVBaseFilter):
 	_srctemplate = Gst.PadTemplate.new('src',
 		Gst.PadDirection.SRC,
 		Gst.PadPresence.ALWAYS,
-		Gst.Caps.from_string("video/x-raw,format=I420"))
+		Gst.Caps.from_string("video/x-raw,format=I420,width=1920,height=1080"))
 
 	_sinktemplate = Gst.PadTemplate.new('sink',
 		Gst.PadDirection.SINK,
@@ -126,9 +131,21 @@ class OpenCVPassthrough(OpenCVBaseFilter):
 		self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=5)
 
 	def do_transform_frame_ip(self, inframe):
+		print("do_transform_ip")
 		imgBuf = inframe.buffer.extract_dup(0, inframe.buffer.get_size())
 		#self.executor.submit(img_of_frame_i420, inframe).add_done_callback(self.checkResult)
 		self.callback(img_of_frame_i420(inframe))
+		return Gst.FlowReturn.OK
+
+	def do_transform_ip(self, buff):
+		height = 1080
+		width = 1920
+
+		data = buff.extract_dup(0, buff.get_size())
+		img = np.ndarray(((height*3/2), width), buffer=data, dtype=np.uint8)
+
+		self.callback(img)
+
 		return Gst.FlowReturn.OK
 
 	def do_set_info(self, incaps, in_info, outcaps, out_info):
