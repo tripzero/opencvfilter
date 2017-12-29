@@ -142,7 +142,7 @@ class OpenCVPassthrough(OpenCVBaseFilter):
 		width = 1920
 
 		data = buff.extract_dup(0, buff.get_size())
-		img = np.ndarray(((height*3/2), width), buffer=data, dtype=np.uint8)
+		img = np.ndarray((int(height*3/2), width), buffer=data, dtype=np.uint8)
 
 		self.callback(img)
 
